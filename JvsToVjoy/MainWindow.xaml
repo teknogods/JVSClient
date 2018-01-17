@@ -1,0 +1,16 @@
+﻿<Window x:Class="JvsToVjoy.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:JvsToVjoy"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="525" Closing="MainWindow_OnClosing">
+    <StackPanel>
+        <TextBlock Name="TxtJvsIo" Text="JVS I/O ID: "/>
+        <TextBlock Name="TxtJvsCmd" Text="JVS I/O Cmd Format Version: "/>
+        <TextBlock Name="TxtJvsVersion" Text="JVS I/O Jvs Version: "/>
+        <TextBlock Name="TxtJvsComm" Text="JVS I/O Communication Version: "/>
+        <Button Click="ButtonBase_OnClick" Content="Start Listening"/>
+    </StackPanel>
+</Window>
