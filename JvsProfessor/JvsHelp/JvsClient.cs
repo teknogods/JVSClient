@@ -104,6 +104,9 @@ namespace JvsProfessor.JvsHelp
                 count++;
             }
 
+            if (CST.cbInQue == 0)
+                return false;
+
             var result = readPacket();
 
             if (result[0] != JVS_STATUS_OK)

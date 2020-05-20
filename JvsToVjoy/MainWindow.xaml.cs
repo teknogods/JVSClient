@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.ComponentModel;
 using System.Threading;
 using System.Windows;
@@ -29,11 +30,12 @@ namespace JvsToVjoy
             Thread.Sleep(1000);
             KillTheThread = false;
             var serialHandler = new SerialHandler();
-            serialHandler.InitSerial("COM4");
-            new Thread(() => serialHandler.RequestJvsInformation()).Start();
-            var vJoyFeeder = new vJoyInjector.VJoyFeeder();
-            new Thread(() => vJoyFeeder.StartInjector()).Start();
+            serialHandler.InitSerial("COM3");
+            var jvsThread = new Thread(() => serialHandler.RequestJvsInformation());
+            jvsThread.Start();
+            var keyb = new KeyboardInjector.KeyboardInject();
             var idSet = false;
+            var vJoyFeeder = new vJoyInjector.VJoyFeeder();
             while (!KillTheThread)
             {
                 if (!serialHandler.JvsInformation.SyncOk)
@@ -41,11 +43,25 @@ namespace JvsToVjoy
                     Thread.Sleep(10);
                     continue;
                 }
+
+                if (!jvsThread.IsAlive)
+                {
+                    Thread.Sleep(100);
+                    jvsThread = new Thread(() => serialHandler.RequestJvsInformation());
+                    jvsThread.Start();
+                    Thread.Sleep(100);
+                }
                 vJoyFeeder.Digitals = serialHandler.JvsInformation.DigitalBytes;
                 vJoyFeeder.AnalogChannels = serialHandler.JvsInformation.AnalogChannels;
+                if (idSet)
+                {
+                    keyb.SendInputs(serialHandler.JvsInformation.DigitalBytes);
+                }
                 if (!idSet && serialHandler.JvsInformation.JvsIdentifier != "")
                 {
                     idSet = true;
+                    //keyb.Initialize();
+                    new Thread(vJoyFeeder.StartInjector).Start();
                     Dispatcher.Invoke(DispatcherPriority.Normal, (Action) (() =>
                     {
                         TxtJvsIo.Text += serialHandler.JvsInformation.JvsIdentifier;
@@ -56,13 +72,24 @@ namespace JvsToVjoy
                 }
                 Thread.Sleep(10);
             }
-            vJoyFeeder.KillMe = true;
+            vJoyFeeder.KillMe = true; 
             serialHandler.CloseSerial();
         }
 
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
         {
             KillTheThread = true;
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            new Thread(() =>
+            {
+                Thread.Sleep(5000);
+                KillTheThread = true;
+                new Thread(HandleTraffic).Start();
+            }
+            ).Start();
         }
     }
 }

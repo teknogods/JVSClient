@@ -28,7 +28,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\bin\x86\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -100,6 +100,10 @@
     <ProjectReference Include="..\JvsProfessor\JvsProfessor.csproj">
       <Project>{19ff7547-3600-4565-bf69-5187f5c97fb1}</Project>
       <Name>JvsProfessor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\KeyboardInjector\KeyboardInjector.csproj">
+      <Project>{cab7afb3-12dc-48df-9cbb-7fc9b0348aa7}</Project>
+      <Name>KeyboardInjector</Name>
     </ProjectReference>
     <ProjectReference Include="..\vJoyInjector\vJoyInjector.csproj">
       <Project>{9f389e30-a204-46fb-9ccf-3e0d02ace4c1}</Project>

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:JvsToVjoy"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525" Closing="MainWindow_OnClosing">
+        Title="MainWindow" Height="350" Width="525" Closing="MainWindow_OnClosing" Loaded="Window_Loaded">
     <StackPanel>
         <TextBlock Name="TxtJvsIo" Text="JVS I/O ID: "/>
         <TextBlock Name="TxtJvsCmd" Text="JVS I/O Cmd Format Version: "/>

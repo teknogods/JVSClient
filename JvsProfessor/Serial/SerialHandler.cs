@@ -86,36 +86,43 @@ namespace JvsClientTest.Serial
 
         public void RequestJvsInformation()
         {
-            while (!JvsClient.send_init_to_master())
+            try
             {
-                // wait until finished
-            }
-            var ioId = JvsClient.GetJvsReply(1, new byte[] {0x10});
-            JvsInformation.JvsIdentifier = System.Text.Encoding.Default.GetString(ioId.ToArray()).Replace("\0", " ");
-            JvsInformation.CmdFormatVersion = JvsClient.GetJvsReply(1, new byte[] { 0x11 }).Single();
-            JvsInformation.JvsVersion = JvsClient.GetJvsReply(1, new byte[] { 0x12 }).Single();
-            JvsInformation.CommVersion = JvsClient.GetJvsReply(1, new byte[] { 0x13 }).Single();
-            var slaveFeatures = JvsClient.GetJvsReply(1, new byte[] { 0x14 });
-            JvsInformation.Features = JvsHelper.ParseSlaveFeatures(slaveFeatures);
-
-            JvsInformation.DigitalBytes = new BitArray((JvsInformation.Features.DigitalPlayerCount * (JvsInformation.Features.DigitalSwitchesPerPlayer / 7) * 8) + 8);
-            JvsInformation.AnalogChannels = new ushort[JvsInformation.Features.AnalogChannels];
-            JvsInformation.SyncOk = true;
-            while (!KillMe)
-            {
-                var digitalBytes = new BitArray(JvsClient.GetJvsReply(1, new byte[] { 0x20, JvsInformation.Features.DigitalPlayerCount, (byte) (JvsInformation.Features.DigitalSwitchesPerPlayer / 7) }).ToArray());
-                for (var i = 0; i < digitalBytes.Count; i++)
+                while (!JvsClient.send_init_to_master())
                 {
-                    JvsInformation.DigitalBytes[i] = digitalBytes[i];
+                    // wait until finished
                 }
+                var ioId = JvsClient.GetJvsReply(1, new byte[] {0x10});
+                JvsInformation.JvsIdentifier = System.Text.Encoding.Default.GetString(ioId.ToArray()).Replace("\0", " ");
+                JvsInformation.CmdFormatVersion = JvsClient.GetJvsReply(1, new byte[] { 0x11 }).Single();
+                JvsInformation.JvsVersion = JvsClient.GetJvsReply(1, new byte[] { 0x12 }).Single();
+                JvsInformation.CommVersion = JvsClient.GetJvsReply(1, new byte[] { 0x13 }).Single();
+                var slaveFeatures = JvsClient.GetJvsReply(1, new byte[] { 0x14 });
+                JvsInformation.Features = JvsHelper.ParseSlaveFeatures(slaveFeatures);
 
-                var analogBytes = JvsClient.GetJvsReply(1, new byte[] { 0x22, JvsInformation.Features.AnalogChannels });
-                for (var i = 0; i < JvsInformation.AnalogChannels.Length; i++)
+                JvsInformation.DigitalBytes = new BitArray((JvsInformation.Features.DigitalPlayerCount * (JvsInformation.Features.DigitalSwitchesPerPlayer / (JvsInformation.Features.DigitalSwitchesPerPlayer / 2)) * 8) + 8);
+                JvsInformation.AnalogChannels = new ushort[JvsInformation.Features.AnalogChannels];
+                JvsInformation.SyncOk = true;
+                while (!KillMe)
                 {
-                    JvsInformation.AnalogChannels[i] = (ushort) (analogBytes[i * 2] + analogBytes[(i * 2) + 1] * 0x1000);
+                    var digitalBytes = new BitArray(JvsClient.GetJvsReply(1, new byte[] { 0x20, JvsInformation.Features.DigitalPlayerCount, (byte) (JvsInformation.Features.DigitalSwitchesPerPlayer / (JvsInformation.Features.DigitalSwitchesPerPlayer / 2)) }).ToArray());
+                    for (var i = 0; i < digitalBytes.Count; i++)
+                    {
+                        JvsInformation.DigitalBytes[i] = digitalBytes[i];
+                    }
+
+                    var analogBytes = JvsClient.GetJvsReply(1, new byte[] { 0x22, JvsInformation.Features.AnalogChannels });
+                    for (var i = 0; i < JvsInformation.AnalogChannels.Length; i++)
+                    {
+                        JvsInformation.AnalogChannels[i] = (ushort) (analogBytes[i * 2] + analogBytes[(i * 2) + 1] * 0x1000);
+                    }
+                    Thread.Sleep(10);
                 }
-                Thread.Sleep(10);
-            }
+                }
+                catch (Exception e)
+                {
+
+                }
         }
     }
 }
